@@ -1,0 +1,251 @@
+openapi: 3.1.0
+info:
+  title: GeoX API
+  version: 1.0.0
+  description: |
+    GeoX provides middleware that attaches geo-location and client signals to each request.
+    This OpenAPI document describes the public endpoints and the full `geo.Info` object
+    returned by the `/debug/geo` endpoint.
+servers:
+  - url: http://localhost:8082
+paths:
+  /:
+    get:
+      summary: Root endpoint
+      description: Returns a simple greeting. When available, server sets `X-Country` and `X-VPN-Suspect` response headers.
+      parameters:
+        - $ref: '#/components/parameters/X-Forwarded-For'
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-Timezone'
+        - $ref: '#/components/parameters/User-Agent'
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Country:
+              description: Two-letter country code determined for the request
+              schema:
+                type: string
+            X-VPN-Suspect:
+              description: VPN suspicion flag
+              schema:
+                type: string
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /debug/geo:
+    get:
+      summary: Debug Geo
+      description: Returns the full JSON dump of the `geo.Info` object computed for the request. Useful for debugging and testing.
+      parameters:
+        - $ref: '#/components/parameters/X-Forwarded-For'
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-Timezone'
+        - $ref: '#/components/parameters/User-Agent'
+      responses:
+        '200':
+          description: Geo info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Info'
+              examples:
+                sample:
+                  summary: Example geo.Info response
+                  value:
+                    ip: "203.0.113.10"
+                    country: "DE"
+                    registeredCountry: "DE"
+                    representedCountry: ""
+                    continent: "EU"
+                    timezone: "Europe/Berlin"
+                    city: "Berlin"
+                    state: "Berlin"
+                    stateCode: "BE"
+                    postalCode: "10115"
+                    lat: 52.52
+                    lon: 13.405
+                    accuracyRadius: 5
+                    metroCode: 0
+                    isAnonymousProxy: false
+                    isSatelliteProvider: false
+                    organization: "Example ISP"
+                    domain: "isp.example.net"
+                    connectionType: ""
+                    asn: 12345
+                    asnOrg: "Example ASN Org"
+                    network: "203.0.113.0/24"
+                    acceptLanguage: "de-DE,de;q=0.9"
+                    timezoneHeader: "Europe/Berlin"
+                    userAgent: "Mozilla/5.0 (...)"
+                    accept: "text/html,application/xhtml+xml"
+                    acceptEncoding: "gzip, deflate, br"
+                    acceptCharset: ""
+                    dnt: ""
+                    secChUa: ""
+                    secChUaMobile: "?0"
+                    secChUaPlatform: "Windows"
+                    xRequestedWith: ""
+                    referer: ""
+                    origin: ""
+                    tzCountry: "DE"
+                    langCountry: "DE"
+                    deviceType: "desktop"
+                    os: "Windows"
+                    browser: "Firefox"
+                    browserVersion: "117.0"
+                    isMobile: false
+                    isBot: false
+                    isHeadless: false
+                    isAutomation: false
+                    isDatacenter: false
+                    isVPN: false
+                    trustLevel: "high"
+        '500':
+          description: Server error or missing geo context
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+components:
+  parameters:
+    X-Forwarded-For:
+      name: X-Forwarded-For
+      in: header
+      description: Client IP address override (first value used)
+      required: false
+      schema:
+        type: string
+    Accept-Language:
+      name: Accept-Language
+      in: header
+      description: Language preferences (used to derive langCountry)
+      schema:
+        type: string
+    X-Timezone:
+      name: X-Timezone
+      in: header
+      description: Client timezone identifier (used to derive tzCountry)
+      schema:
+        type: string
+    User-Agent:
+      name: User-Agent
+      in: header
+      description: User-Agent string (used for device/browser heuristics)
+      schema:
+        type: string
+
+  schemas:
+    Info:
+      type: object
+      description: Full geo information attached to a request by the GeoX middleware
+      properties:
+        ip:
+          type: string
+          description: Client IP used for lookups
+        country:
+          type: string
+          description: ISO 3166-1 alpha-2 country code
+        registeredCountry:
+          type: string
+        representedCountry:
+          type: string
+        continent:
+          type: string
+        timezone:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        stateCode:
+          type: string
+        postalCode:
+          type: string
+        lat:
+          type: number
+          format: double
+        lon:
+          type: number
+          format: double
+        accuracyRadius:
+          type: integer
+        metroCode:
+          type: integer
+        isAnonymousProxy:
+          type: boolean
+        isSatelliteProvider:
+          type: boolean
+        organization:
+          type: string
+        domain:
+          type: string
+        connectionType:
+          type: string
+        asn:
+          type: integer
+        asnOrg:
+          type: string
+        network:
+          type: string
+        acceptLanguage:
+          type: string
+        timezoneHeader:
+          type: string
+        userAgent:
+          type: string
+        accept:
+          type: string
+        acceptEncoding:
+          type: string
+        acceptCharset:
+          type: string
+        dnt:
+          type: string
+        secChUa:
+          type: string
+        secChUaMobile:
+          type: string
+        secChUaPlatform:
+          type: string
+        xRequestedWith:
+          type: string
+        referer:
+          type: string
+        origin:
+          type: string
+        tzCountry:
+          type: string
+        langCountry:
+          type: string
+        deviceType:
+          type: string
+          description: mobile, tablet, desktop, bot, unknown
+        os:
+          type: string
+        browser:
+          type: string
+        browserVersion:
+          type: string
+        isMobile:
+          type: boolean
+        isBot:
+          type: boolean
+        isHeadless:
+          type: boolean
+        isAutomation:
+          type: boolean
+        isDatacenter:
+          type: boolean
+        isVPN:
+          type: boolean
+        trustLevel:
+          type: string
+          description: one of unknown, very_low, low, medium, high
+      required: [ip]

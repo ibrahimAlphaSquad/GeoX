@@ -194,3 +194,14 @@ MAXMIND_LICENSE_KEY=your_key_here ./scripts/download_geoip.sh
 ```
 
 The script requires `curl` or `wget` and `tar` for archive extraction.
+
+## API Documentation (Swagger)
+
+The project includes an OpenAPI (Swagger) spec and a small Swagger UI.
+
+Start the server and visit `http://localhost:8082/docs` to view interactive API documentation.
+
+Files added:
+
+- `openapi.yaml` — OpenAPI 3.0 spec for the basic endpoints.
+- `docs/swagger.html` — Swagger UI wrapper that loads the spec from `/openapi.yaml`.
