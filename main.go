@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"GeoX/geo" // adjust module path
+	"GeoX/geo"
 )
 
 func main() {

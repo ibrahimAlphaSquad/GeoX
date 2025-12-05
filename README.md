@@ -1,5 +1,7 @@
 # GeoIP Country Detection
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+
 This guide explains how to implement IP-based country detection **using only Go** and a **local GeoIP database**. No third‑party services or client‑side logic are required.
 
 It includes:
@@ -161,3 +163,9 @@ You can extend this design by adding:
 * Per-country access control
 * Dynamic rate limiting based on country
 * Risk scoring using multiple signals
+
+---
+
+## License
+
+This project is licensed under the MIT License — see the `LICENSE` file for details.

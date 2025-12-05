@@ -1,0 +1,42 @@
+# Binaries for programs and plugins
+/bin/
+/pkg/
+
+# Test binary, coverage
+*.test
+coverage.out
+*.out
+
+# Build output
+/build/
+dist/
+
+# Dependency directories
+vendor/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editors and IDEs
+.vscode/
+.idea/
+*.swp
+*~
+
+# Logs and runtime files
+*.log
+.env
+.env.local
+
+# Go workspace
+go.work
+
+# Node (if present)
+node_modules/
+
+# Misc
+.cache/
+
+# geoip data
+geoip/
