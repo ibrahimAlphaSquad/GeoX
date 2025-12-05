@@ -169,3 +169,28 @@ You can extend this design by adding:
 ## License
 
 This project is licensed under the MIT License — see the `LICENSE` file for details.
+
+## Download GeoIP databases
+
+A helper script is provided to fetch GeoLite2 MMDB files. By default (no flags) it will try to download standard MMDBs from the `P3TERX/GeoLite.mmdb` GitHub repository and place them in the `geoip/` directory.
+
+Usage:
+
+```bash
+chmod +x ./scripts/download_geoip.sh
+./scripts/download_geoip.sh
+```
+
+You can also download a single raw MMDB directly from a GitHub URL:
+
+```bash
+./scripts/download_geoip.sh --github-url https://raw.githubusercontent.com/P3TERX/GeoLite.mmdb/main/GeoLite2-City.mmdb
+```
+
+Or use a MaxMind license key to download official GeoLite2 archives:
+
+```bash
+MAXMIND_LICENSE_KEY=your_key_here ./scripts/download_geoip.sh
+```
+
+The script requires `curl` or `wget` and `tar` for archive extraction.

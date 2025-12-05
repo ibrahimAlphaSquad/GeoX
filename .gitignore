@@ -38,5 +38,5 @@ node_modules/
 # Misc
 .cache/
 
-# geoip data
-geoip/
+# GeoIP DBs (downloaded binary data)
+geoip/*.mmdb
