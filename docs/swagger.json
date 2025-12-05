@@ -1,0 +1,15 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "GeoX provides middleware attaching geo and client signals to requests.",
+        "title": "GeoX API",
+        "contact": {
+            "name": "Project",
+            "url": "https://github.com/ibrahimAlphaSquad/GeoX"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8082",
+    "basePath": "/",
+    "paths": {}
+}

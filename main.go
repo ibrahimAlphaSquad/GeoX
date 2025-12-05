@@ -1,10 +1,20 @@
 package main
 
+// @title GeoX API
+// @version 1.0
+// @description GeoX provides middleware attaching geo and client signals to requests.
+// @contact.name Project
+// @contact.url https://github.com/ibrahimAlphaSquad/GeoX
+// @host localhost:8082
+// @BasePath /
+
 import (
 	"encoding/json"
 	"log"
 	"net/http"
 	"os"
+
+	_ "github.com/swaggo/swag"
 
 	"GeoX/geo"
 )

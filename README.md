@@ -205,3 +205,25 @@ Files added:
 
 - `openapi.yaml` — OpenAPI 3.0 spec for the basic endpoints.
 - `docs/swagger.html` — Swagger UI wrapper that loads the spec from `/openapi.yaml`.
+
+If you prefer to auto-generate docs from code comments using `swag` (swaggo), you can do so:
+
+1. Install the `swag` CLI:
+
+```bash
+go install github.com/swaggo/swag/cmd/swag@latest
+```
+
+2. Generate docs into `./docs` (this will create `docs/docs.go`, `docs/swagger.json`, etc.):
+
+```bash
+swag init -g main.go -o docs
+```
+
+Alternatively use the provided Makefile target:
+
+```bash
+make docs
+```
+
+After generation, start the server and open `http://localhost:8082/docs` (or `/swagger/index.html` if you use http-swagger) to view interactive documentation.

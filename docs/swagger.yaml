@@ -1,0 +1,11 @@
+basePath: /
+host: localhost:8082
+info:
+  contact:
+    name: Project
+    url: https://github.com/ibrahimAlphaSquad/GeoX
+  description: GeoX provides middleware attaching geo and client signals to requests.
+  title: GeoX API
+  version: "1.0"
+paths: {}
+swagger: "2.0"
