@@ -1,76 +1,60 @@
 package geo
 
 import (
-	"context"
-	"net"
-	"net/http"
-	"strings"
+    "context"
+    "net"
+    "net/http"
+    "strings"
 )
 
 type ctxKey int
 
 const geoKey ctxKey = iota
 
-// WithContext stores the Geo context into the request context.
-func withContext(ctx context.Context, geo *Context) context.Context {
-	return context.WithValue(ctx, geoKey, geo)
-}
-
-// FromRequest retrieves the Geo context from the request.
-func FromRequest(r *http.Request) *Context {
-	if v := r.Context().Value(geoKey); v != nil {
-		if g, ok := v.(*Context); ok {
-			return g
-		}
-	}
-	return nil
-}
-
-// Middleware computes geo info and adds it to the request context.
+// Middleware attaches a *geo.Info to each request.
 func Middleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// 1. Extract client IP (respect X-Forwarded-For if behind proxy)
-		xff := r.Header.Get("X-Forwarded-For")
-		ip := ""
-		if xff != "" {
-			parts := strings.Split(xff, ",")
-			ip = strings.TrimSpace(parts[0])
-		} else {
-			// r.RemoteAddr usually "ip:port"
-			host, _, err := net.SplitHostPort(r.RemoteAddr)
-			if err != nil {
-				host = r.RemoteAddr
-			}
-			ip = host
-		}
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        ipStr := extractIP(r)
 
-		// 2. Signal sources
-		countryFromIp := getCountryFromIP(ip)
-		tzHeader := r.Header.Get("X-Timezone")       // set by frontend
-		langHeader := r.Header.Get("Accept-Language") // from browser
+        // 1. Geo lookups
+        info := lookupAll(ipStr)
 
-		tzCountry := getCountryFromTimezone(tzHeader)
-		langCountry := getCountryFromAcceptLanguage(langHeader)
+        // 2. Headers and derived data
+        enrichFromHeaders(info, r)
 
-		dc := isDatacenterIP(ip)
-		trust := computeTrust(countryFromIp, tzCountry, langCountry, dc)
+        // 3. Datacenter / VPN detection
+        parsed := net.ParseIP(ipStr)
+        info.IsDatacenterIP = isDatacenterIP(parsed)
+        info.IsVPN = looksLikeVPN(info)
+        info.TrustLevel = computeTrust(info)
 
-		vpnSuspect := dc ||
-			(countryFromIp != "" && tzCountry != "" && countryFromIp != tzCountry) ||
-			(countryFromIp != "" && langCountry != "" && countryFromIp != langCountry)
+        ctx := context.WithValue(r.Context(), geoKey, info)
+        next.ServeHTTP(w, r.WithContext(ctx))
+    })
+}
 
-		geo := &Context{
-			IP:           ip,
-			Country:      countryFromIp,
-			Timezone:     tzHeader,
-			LangHeader:   langHeader,
-			TzCountry:    tzCountry,
-			LangCountry:  langCountry,
-			IsVpnSuspect: vpnSuspect,
-			TrustLevel:   trust,
-		}
+// extractIP considers X-Forwarded-For then falls back to RemoteAddr.
+func extractIP(r *http.Request) string {
+    xff := r.Header.Get("X-Forwarded-For")
+    if xff != "" {
+        parts := strings.Split(xff, ",")
+        if len(parts) > 0 {
+            return strings.TrimSpace(parts[0])
+        }
+    }
+    host, _, err := net.SplitHostPort(r.RemoteAddr)
+    if err != nil {
+        return r.RemoteAddr
+    }
+    return host
+}
 
-		ctx := withContext(r.Context(), geo)
-		next.ServeHTTP(w, r.WithContext(ctx))
-	})
+// FromRequest returns *Info attached by the middleware.
+func FromRequest(r *http.Request) *Info {
+    if v := r.Context().Value(geoKey); v != nil {
+        if info, ok := v.(*Info); ok {
+            return info
+        }
+    }
+    return nil
 }
